@@ -9,15 +9,18 @@
 <body>
 	<div id="paper"></div>
 
+	<div id="chartImage"></div>
+
+
 	<script src="../../../dist/astrochart.js"></script>
 	<script type="text/javascript">
-
 
 
 
 		function getQueryParams() {
 			const params = new URLSearchParams(window.location.search);
 			const data = {
+				id : params.get('id'),
 				planets: {},
 				cusps: []
 			};
@@ -49,7 +52,35 @@
 			// Add points of interest using cusps
 			radix.addPointsOfInterest({ "As": [data.cusps[1]], "Ic": [data.cusps[3]], "Ds": [data.cusps[6]], "Mc": [data.cusps[9]] });
 			radix.aspects();
+
+            saveChartImage(data.id);
 		};
+
+		function saveChartImage(id) {
+            var svgElement = document.getElementById('paper').querySelector('svg');
+            var svgData = new XMLSerializer().serializeToString(svgElement);
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+
+            var img = new Image();
+            img.onload = function () {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                var pngFile = canvas.toDataURL('image/png');
+
+
+			 	document.getElementById('chartImage').innerHTML = '<img src="'+pngFile+'"></img>';
+				
+                // var downloadLink = document.createElement('a');
+                // downloadLink.href = pngFile;
+				// console.log(id, pngFile);
+                // downloadLink.download = 'natal_chart_'+id+'.png';
+                // downloadLink.click();
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+        }
 
 
 
